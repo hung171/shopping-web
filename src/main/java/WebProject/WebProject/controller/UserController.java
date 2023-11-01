@@ -153,7 +153,8 @@ public class UserController {
 		model.addAttribute("messageChangeProfile", messageChangeProfile);
 		session.setAttribute("messageChangeProfile", null);
 		if (user == null) {
-			return "redirect:" + referer;
+			session.setAttribute("AddToCartErr", "Vui lòng đăng nhập trước khi thực hiện thao tác!");
+			return "redirect:/home";
 		} else {
 			String error_change_pass = (String) session.getAttribute("error_change_pass");
 			String ChangePassSuccess = (String) session.getAttribute("ChangePassSuccess");
@@ -242,7 +243,7 @@ public class UserController {
 		if (noSendEmail == null) {
 			int code = (int) Math.floor(((Math.random() * 899999) + 100000));
 			Mail mail = new Mail();
-			mail.setMailFrom("haovo1512@gmail.com");
+			mail.setMailFrom("hungnguyen17120@gmail.com");
 			mail.setMailTo(userForgot.getEmail());
 			mail.setMailSubject("For got Password");
 			mail.setMailContent("Your code is: " + code);

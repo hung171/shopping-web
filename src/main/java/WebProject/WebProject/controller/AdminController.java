@@ -1,15 +1,8 @@
 package WebProject.WebProject.controller;
 
-import java.io.IOException;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import WebProject.WebProject.entity.*;
+import WebProject.WebProject.model.Mail;
+import WebProject.WebProject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,24 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import WebProject.WebProject.entity.Category;
-import WebProject.WebProject.entity.Order;
-import WebProject.WebProject.entity.Order_Item;
-import WebProject.WebProject.entity.Product;
-import WebProject.WebProject.entity.ProductImage;
-import WebProject.WebProject.entity.User;
-import WebProject.WebProject.model.Mail;
-import WebProject.WebProject.service.CategoryService;
-import WebProject.WebProject.service.CloudinaryService;
-import WebProject.WebProject.service.MailService;
-import WebProject.WebProject.service.OrderService;
-import WebProject.WebProject.service.Order_ItemService;
-import WebProject.WebProject.service.ProductImageService;
-import WebProject.WebProject.service.ProductService;
-import WebProject.WebProject.service.UserService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @Controller
 public class AdminController {
@@ -112,7 +96,6 @@ public class AdminController {
 			List<Product> listProduct = productService.getAllProduct();
 			List<User> listUser = userService.findAll();
 			List<Category> listCategory = categoryService.findAll();
-
 			List<Order> recentOrders = orderService.findTop5RecentOrder();
 			List<String> recentUser = orderService.findTop5RecentCustomer();
 			List<User> recentCustomer = new ArrayList<>();
@@ -171,7 +154,7 @@ public class AdminController {
 		System.out.println(message);
 		System.out.println(email);
 		Mail mail = new Mail();
-		mail.setMailFrom("haovo1512@gmail.com");
+		mail.setMailFrom("hungnguyen17011911@gmail.com");
 		mail.setMailTo(email);
 		mail.setMailSubject("This is message from Male fashion.");
 		mail.setMailContent(message);
@@ -205,24 +188,24 @@ public class AdminController {
 			return "redirect:/signin-admin";
 		} else {
 			List<Order> listOrder = orderService.findAll();
-			List<Order> listPaymentWithMomo = orderService.findAllByPayment_Method("Payment with momo");
+			/*List<Order> listPaymentWithMomo = orderService.findAllByPayment_Method("Payment with momo");*/
 			List<Order> listPaymentOnDelivery = orderService.findAllByPayment_Method("Payment on delivery");
 			int TotalMomo = 0;
 			int TotalDelivery = 0;
-			for (Order y : listPaymentWithMomo) {
+			/*for (Order y : listPaymentWithMomo) {
 				TotalMomo = TotalMomo + y.getTotal();
-			}
+			}*/
 			for (Order y : listPaymentOnDelivery) {
 				TotalDelivery = TotalDelivery + y.getTotal();
 			}
-			List<Order> listRecentMomo = orderService.findTop5OrderByPaymentMethod("Payment with momo");
+			/*List<Order> listRecentMomo = orderService.findTop5OrderByPaymentMethod("Payment with momo");*/
 			List<Order> listRecentDelivery = orderService.findTop5OrderByPaymentMethod("Payment on delivery");
 
 			model.addAttribute("TotalMomo", TotalMomo);
 			model.addAttribute("TotalDelivery", TotalDelivery);
 			model.addAttribute("TotalOrder", listOrder.size());
 			model.addAttribute("listRecentDelivery", listRecentDelivery);
-			model.addAttribute("listRecentMomo", listRecentMomo);
+		/*	model.addAttribute("listRecentMomo", listRecentMomo);*/
 			return "dashboard-wallet";
 		}
 	}
@@ -238,6 +221,9 @@ public class AdminController {
 			Page<Product> pageProduct = productService.findAll(pageable);
 			model.addAttribute("pageProduct", pageProduct);
 			model.addAttribute("listCategories", listCategories);
+			String deleteProduct = (String) session.getAttribute("deleteProduct");
+			model.addAttribute("deleteProduct", deleteProduct);
+			session.setAttribute("deleteProduct", null);
 			return "dashboard-myproducts";
 		}
 	}
@@ -443,6 +429,24 @@ public class AdminController {
 				return "redirect:/dashboard-addproduct";
 			}
 
+		}
+	}
+
+	@GetMapping("dashboard-deleteproduct/{productId}")
+	public String deleteProduct(Model model, @PathVariable("productId") int productId) {
+		User admin = (User) session.getAttribute("admin");
+		if (admin == null) {
+			return "redirect:/signin-admin";
+		} else {
+			Product product = productService.getProductById(productId);
+			if (product != null) {
+				productImageService.deleteByProductId(product.getId());
+				productService.deleteProductById(product.getId());
+				session.setAttribute("deleteProduct", "deleteProductSuccess");
+				return "redirect:/dashboard-myproducts";
+			} else {
+				return "redirect:/dashboard-myproducts";
+			}
 		}
 	}
 

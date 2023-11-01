@@ -9,12 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import WebProject.WebProject.entity.Product;
-/**
- * @author HOAN HAO
- *
- */
+
 @Repository
-public interface ProductRepository extends JpaRepository<Product,Long>{
+public interface ProductRepository extends JpaRepository<Product,Integer >{
 	
 	@Query(value="select * from product p where p.product_name like %?1%",nativeQuery = true)
 	List<Product> findByProduct_NameContaining(String name);

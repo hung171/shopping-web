@@ -13,6 +13,7 @@
 ================================================== -->
 <link rel="stylesheet" href="/listeo/css/style.css">
 <link rel="stylesheet" href="/listeo/css/main-color.css" id="colors">
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <link rel="icon" href="/img/logo-3.png">
 </head>
 
@@ -20,7 +21,9 @@
 
 	<!-- Wrapper -->
 	<div id="wrapper">
-
+		<script th:if="${deleteProduct != null}">
+			swal("Delete successful product!", "", "success");
+		</script>
 		<!-- Header Container
 ================================================== -->
 		<header id="header-container" class="fixed fullwidth dashboard">
@@ -34,8 +37,8 @@
 
 						<!-- Logo -->
 						<div id="logo">
-							<a href="index.html"><img src="/images/logo2.png" alt=""></a>
-							<a href="index.html" class="dashboard-logo"><img
+							<a href="home.html"><img src="/images/logo2.png" alt=""></a>
+							<a href="home.html" class="dashboard-logo"><img
 								src="/images/logo2.png" alt=""></a>
 						</div>
 
@@ -210,8 +213,8 @@
 										</div>
 										<div class="buttons-to-right">
 											<a th:href="@{/dashboard-myproducts/edit/{id}(id=${y.id})}" class="button gray"><i
-												class="sl sl-icon-note"></i> Edit</a> <a href="#"
-												class="button gray"><i class="sl sl-icon-close"></i>
+												class="sl sl-icon-note"></i> Edit</a>
+											<a th:href="@{/dashboard-deleteproduct/{id}(id=${y.id})}" class="button gray"><i class="sl sl-icon-close"></i>
 												Delete</a>
 										</div>
 									</li>
@@ -294,6 +297,5 @@
 	<script type="text/javascript" src="/scripts/tooltips.min.js"></script>
 	<script type="text/javascript" src="/scripts/custom.js"></script>
 	<script type="text/javascript" src="/scripts/myjs.js"> </script>
-
 </body>
 </html>

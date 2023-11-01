@@ -1,11 +1,6 @@
 package WebProject.WebProject.controller;
 
-import java.sql.Date;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
@@ -14,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.expression.spel.support.ReflectivePropertyAccessor.OptimalPropertyAccessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,8 +60,8 @@ public class ProductControler {
 		session.setAttribute("NoSignIn", null);
 		session.setAttribute("error_momo", null);
 		String a = (String) session.getAttribute("NoSignIn");
-		System.out.println(a);
-		System.out.println(NoSignIn);
+		System.out.println(a + " thong bao 1");
+		System.out.println(NoSignIn + " thong bao 2");
 		User acc = (User) session.getAttribute("acc");
 		if (remember != null) {
 			acc = userService.findByIdAndRole(user_name.getValue(), "user");
@@ -88,7 +82,7 @@ public class ProductControler {
 		List<Product> Top12ProductNewArrivals = productService.findTop12ProductNewArrivals();
 		model.addAttribute("Top12ProductBestSellers", Top12ProductBestSellers);
 		model.addAttribute("Top12ProductNewArrivals", Top12ProductNewArrivals);
-		return "index";
+		return "home";
 	}
 	@GetMapping("/shop")
 	public String shop(Model model) throws Exception {

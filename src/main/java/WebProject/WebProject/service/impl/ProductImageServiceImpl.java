@@ -7,6 +7,8 @@ import WebProject.WebProject.entity.ProductImage;
 import WebProject.WebProject.repository.ProductImageRepository;
 import WebProject.WebProject.service.ProductImageService;
 
+import javax.transaction.Transactional;
+
 @Service
 public class ProductImageServiceImpl implements ProductImageService{
 	@Autowired
@@ -21,6 +23,11 @@ public class ProductImageServiceImpl implements ProductImageService{
 	public void deleteById(int id) {
 		productImageRepository.deleteById(id);
 	}
-	
-	
+
+	@Override
+	public void deleteByProductId(int productId) {
+		productImageRepository.deleteProductImageByProductId(productId);
+	}
+
+
 }

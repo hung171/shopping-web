@@ -8,4 +8,6 @@ public interface ProductImageService {
 
 	void deleteById(int id);
 
+	void deleteByProductId(int productId);
+
 }
