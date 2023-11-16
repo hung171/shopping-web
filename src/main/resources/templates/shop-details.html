@@ -59,7 +59,9 @@
 		</div>
 		<div class="offcanvas__nav__option">
 			<a href="#" class="search-switch"><img src="/img/icon/search.png"
-				alt=""></a> <a href="#"><img src="/img/icon/heart.png" alt=""></a>
+				alt=""></a>
+			<a th:href="@{/outfit}"><img
+					src="/img/icon/heart.png" alt=""></a>
 			<a th:href="@{/cart}"><img src="/img/icon/cart.png" alt="">
 				<span th:text="${session.countCart}"></span></a>
 		</div>
@@ -119,6 +121,7 @@
 									<li><a th:href="@{/cart}">Shopping Cart</a></li>
 									<li><a th:href="@{/myprofile}">My Profile</a></li>
 									<li><a th:href="@{/myhistory}">My History</a></li>
+									<li><a th:href="@{/outfit}">Outfit</a></li>
 									<li><a th:href="@{/about}">About Us</a></li>
 								</ul></li>
 							<li><a th:href="@{/blog}">Blog</a></li>
@@ -129,8 +132,10 @@
 				<div class="col-lg-3 col-md-3">
 					<div class="header__nav__option">
 						<a href="#" class="search-switch"><img
-							src="/img/icon/search.png" alt=""></a> <a href="#"><img
-							src="/img/icon/heart.png" alt=""></a> <a th:href="@{/cart}"><img
+							src="/img/icon/search.png" alt=""></a>
+						<a th:href="@{/outfit}"><img
+							src="/img/icon/heart.png" alt=""></a>
+						<a th:href="@{/cart}"><img
 							src="/img/icon/cart.png" alt=""> <span
 							th:text="${session.countCart}"></span></a>
 					</div>

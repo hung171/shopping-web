@@ -1,16 +1,13 @@
 package WebProject.WebProject.service.impl;
 
-import java.util.List;
-
-import org.hibernate.Session;
+import WebProject.WebProject.entity.User;
+import WebProject.WebProject.repository.UserRepository;
+import WebProject.WebProject.service.UserService;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
-import WebProject.WebProject.entity.User;
-import WebProject.WebProject.repository.UserRepository;
-import WebProject.WebProject.service.UserService;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -23,11 +20,6 @@ public class UserServiceImpl implements UserService{
 		super();
 		this.userRepository=userRepository;
 	}
-	@Override
-	public List<User> getAllUser() {
-		// TODO Auto-generated method stub
-		return userRepository.findAll();
-	}
 
 	@Override
 	public User saveUser(User user) {
@@ -35,22 +27,6 @@ public class UserServiceImpl implements UserService{
 		return userRepository.save(user);
 	}
 
-	@Override
-	public User updateUser(User user) {
-		// TODO Auto-generated method stub
-		return userRepository.save(user);
-	}
-
-	@Override
-	public void deleteUserById(String id) {
-		// TODO Auto-generated method stub
-		userRepository.deleteById(id);
-	}
-	@Override
-	public User GetUserByEmail(String email) {
-		// TODO Auto-generated method stub
-		return userRepository.findByEmail(email);
-	}
 	@Override
 	public User findByIdAndRole(String id, String role) {
 		return userRepository.findByIdAndRole(id, role);

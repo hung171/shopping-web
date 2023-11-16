@@ -62,7 +62,7 @@ public class AdminController {
 
 	@PostMapping("signin-admin")
 	public String SignInAdminHandel(@ModelAttribute("login-name") String login_name,
-			@ModelAttribute("pass") String pass, Model model) throws Exception {
+			@ModelAttribute("pass") String pass) {
 		User admin = userService.findByIdAndRole(login_name, "admin");
 		if (admin == null) {
 			session.setAttribute("err_sign_admin", "UserName or Password is not correct!");
@@ -113,7 +113,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/dashboard-invoice/{id}")
-	public String InvoiceView(@PathVariable int id, Model model, HttpServletRequest request) {
+	public String InvoiceView(@PathVariable int id, Model model) {
 		Order order = orderService.findById(id);
 		List<Order_Item> listOrder_Item = order_ItemService.getAllByOrder_Id(order.getId());
 		model.addAttribute("listOrder_Item", listOrder_Item);
@@ -148,8 +148,8 @@ public class AdminController {
 	}
 
 	@PostMapping("/send-message")
-	public String SendMessage(Model model, @ModelAttribute("message") String message,
-			@ModelAttribute("email") String email, HttpServletRequest request) throws Exception {
+	public String SendMessage(@ModelAttribute("message") String message,
+							  @ModelAttribute("email") String email, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
 		System.out.println(message);
 		System.out.println(email);
@@ -163,7 +163,7 @@ public class AdminController {
 	}
 
 	@GetMapping("/delete-order/{id}")
-	public String DeleteOrder(@PathVariable int id, Model model, HttpServletRequest request) throws Exception {
+	public String DeleteOrder(@PathVariable int id, HttpServletRequest request) {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
 			return "redirect:/signin-admin";
@@ -188,24 +188,16 @@ public class AdminController {
 			return "redirect:/signin-admin";
 		} else {
 			List<Order> listOrder = orderService.findAll();
-			/*List<Order> listPaymentWithMomo = orderService.findAllByPayment_Method("Payment with momo");*/
 			List<Order> listPaymentOnDelivery = orderService.findAllByPayment_Method("Payment on delivery");
-			int TotalMomo = 0;
 			int TotalDelivery = 0;
-			/*for (Order y : listPaymentWithMomo) {
-				TotalMomo = TotalMomo + y.getTotal();
-			}*/
 			for (Order y : listPaymentOnDelivery) {
 				TotalDelivery = TotalDelivery + y.getTotal();
 			}
-			/*List<Order> listRecentMomo = orderService.findTop5OrderByPaymentMethod("Payment with momo");*/
 			List<Order> listRecentDelivery = orderService.findTop5OrderByPaymentMethod("Payment on delivery");
 
-			model.addAttribute("TotalMomo", TotalMomo);
 			model.addAttribute("TotalDelivery", TotalDelivery);
 			model.addAttribute("TotalOrder", listOrder.size());
 			model.addAttribute("listRecentDelivery", listRecentDelivery);
-		/*	model.addAttribute("listRecentMomo", listRecentMomo);*/
 			return "dashboard-wallet";
 		}
 	}
@@ -246,10 +238,10 @@ public class AdminController {
 	}
 
 	@PostMapping("/dashboard-myproducts/edit")
-	public String DashboardMyProductEditHandel(Model model, @ModelAttribute("product_id") int product_id,
-			@ModelAttribute("product_name") String product_name, @ModelAttribute("price") String price,
-			@ModelAttribute("availability") String availability, @ModelAttribute("category") int category,
-			@ModelAttribute("description") String description, @ModelAttribute("listImage") MultipartFile[] listImage)
+	public String DashboardMyProductEditHandel(@ModelAttribute("product_id") int product_id,
+											   @ModelAttribute("product_name") String product_name, @ModelAttribute("price") String price,
+											   @ModelAttribute("availability") String availability, @ModelAttribute("category") int category,
+											   @ModelAttribute("description") String description, @ModelAttribute("listImage") MultipartFile[] listImage)
 			throws Exception {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
@@ -258,10 +250,6 @@ public class AdminController {
 			if (listImage != null) {
 				Category cate = categoryService.getCategoryById(category);
 				Product product = productService.getProductById(product_id);
-//				System.out.println(cate);
-//				long millis = System.currentTimeMillis();
-//				Date create_at = new java.sql.Date(millis);
-//				Product newPro = new Product();
 				product.setProduct_Name(product_name);
 				product.setPrice(Integer.parseInt(price));
 				product.setQuantity(Integer.parseInt(availability));
@@ -354,8 +342,7 @@ public class AdminController {
 		} else {
 			String search_input = (String) session.getAttribute("search_input_dashboard");
 			int category_selected = (int) session.getAttribute("category_selected");
-//			int category_selected = 0;
-			Page<Product> pageProduct = null;
+			Page<Product> pageProduct;
 			Pageable pageable = PageRequest.of(page, 3);
 			if (category_selected > 0) {
 				pageProduct = productService.findByProduct_NameAndCategory_idContaining(search_input, category_selected,

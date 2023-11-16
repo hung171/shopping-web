@@ -33,7 +33,7 @@ public class CartController {
 	public String CartView(Model model) throws Exception {
 		User user = (User) session.getAttribute("acc");
 		if (user == null) {
-			session.setAttribute("NoSignIn", "Vui lòng đăng nhập trước khi thực hiện thao tác");
+			session.setAttribute("AddToCartErr", "Vui lòng đăng nhập trước khi thực hiện thao tác!");
 			return "redirect:/home";
 		} else {
 			List<Cart> listCart = cartService.GetAllCartByUser_id(user.getId());
@@ -68,13 +68,11 @@ public class CartController {
 	}
 
 	@PostMapping("/updateCart")
-	public String UpdateCart(HttpServletRequest request, Model model) throws Exception {
+	public String UpdateCart(HttpServletRequest request) {
 		@SuppressWarnings("unchecked")
 		List<Cart> listCart = (List<Cart>) session.getAttribute("listCart");
 		int i = 0;
 		for (Cart o : listCart) {
-//			System.out.println("count"+i);
-//			String a=(String) model.getAttribute("count" + i);
 			String a = request.getParameter("count" + i);
 			int count = Integer.parseInt(a);
 			System.out.println(count);
@@ -88,7 +86,7 @@ public class CartController {
 	}
 
 	@GetMapping("/addToCart/{id}")
-	public String AddToCart(@PathVariable int id, Model model, HttpServletRequest request) throws Exception {
+	public String AddToCart(@PathVariable int id, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
 		User user = (User) session.getAttribute("acc");
 		if (user == null) {

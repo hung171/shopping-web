@@ -1,16 +1,9 @@
 package WebProject.WebProject.controller;
 
-import java.io.IOException;
-import java.util.Base64;
-import java.util.List;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.fluent.Form;
-import org.apache.http.client.fluent.Request;
+import WebProject.WebProject.entity.Cart;
+import WebProject.WebProject.entity.User;
+import WebProject.WebProject.model.Mail;
+import WebProject.WebProject.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,18 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import WebProject.WebProject.service.CloudinaryService;
-
-import WebProject.WebProject.entity.Cart;
-import WebProject.WebProject.entity.User;
-import WebProject.WebProject.model.Mail;
-import WebProject.WebProject.service.CartService;
-import WebProject.WebProject.service.CookieService;
-import WebProject.WebProject.service.MailService;
-import WebProject.WebProject.service.UserService;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -54,7 +41,7 @@ public class UserController {
 	CookieService cookie;
 
 	@GetMapping("/signin")
-	public String SigInView(Model model) throws Exception {
+	public String SigInView(Model model) {
 		Cookie login_name = cookie.read("login_name");
 		Cookie pass = cookie.read("pass");
 		if (login_name != null)
@@ -78,19 +65,18 @@ public class UserController {
 	}
 
 	@GetMapping("about")
-	public String AboutView(Model model) {
+	public String AboutView() {
 		return "about";
 	}
 
 	@GetMapping("blog")
-	public String BlogView(Model model) {
+	public String BlogView() {
 		return "blog";
 	}
 
 	@PostMapping("/signin")
 	public String SignIn(@ModelAttribute("login-name") String loginname, @ModelAttribute("password") String password,
-			@RequestParam(value = "remember", defaultValue = "false") boolean remember, Model model) throws Exception {
-//		User user = userService.getUserById(loginname);
+			@RequestParam(value = "remember", defaultValue = "false") boolean remember, Model model) {
 		User user = userService.findByIdAndRole(loginname, "user");
 		if (user != null) {
 			String decodedValue = new String(Base64.getDecoder().decode(user.getPassword()));
@@ -122,7 +108,7 @@ public class UserController {
 	@PostMapping("/signup")
 	public String SignUp(@ModelAttribute("username") String id, @ModelAttribute("your_email") String email,
 			@ModelAttribute("fullname") String fullname, @ModelAttribute("password") String password,
-			@ModelAttribute("comfirm_password") String comfirm_password, Model model) throws Exception {
+			@ModelAttribute("comfirm_password") String comfirm_password, Model model) {
 
 		User user = userService.findByIdAndRole(id, "user");
 
@@ -139,7 +125,7 @@ public class UserController {
 	}
 
 	@GetMapping("/signout")
-	public String SignOut(Model model) {
+	public String SignOut() {
 		session.setAttribute("acc", null);
 		cookie.delete("remember");
 		return "redirect:/home";
@@ -148,7 +134,6 @@ public class UserController {
 	@GetMapping("/myprofile")
 	public String Myprofile(Model model, HttpServletRequest request) {
 		User user = (User) session.getAttribute("acc");
-		String referer = request.getHeader("Referer");
 		String messageChangeProfile = (String) session.getAttribute("messageChangeProfile");
 		model.addAttribute("messageChangeProfile", messageChangeProfile);
 		session.setAttribute("messageChangeProfile", null);
@@ -169,9 +154,9 @@ public class UserController {
 	}
 
 	@PostMapping("/changepassword")
-	public String ChangePassword(Model model, @ModelAttribute("current_password") String current_password,
-			@ModelAttribute("new_password") String new_password,
-			@ModelAttribute("confirm_password") String confirm_password, HttpServletRequest request) {
+	public String ChangePassword(@ModelAttribute("current_password") String current_password,
+								 @ModelAttribute("new_password") String new_password,
+								 @ModelAttribute("confirm_password") String confirm_password, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
 		User user = (User) session.getAttribute("acc");
 		String decodedValue = new String(Base64.getDecoder().decode(user.getPassword()));
@@ -194,9 +179,9 @@ public class UserController {
 	}
 
 	@PostMapping("/changeProfile")
-	public String ChangeProfile(Model model, @ModelAttribute("avatar") MultipartFile avatar,
-			@ModelAttribute("fullname") String fullname, @ModelAttribute("phone") String phone,
-			@ModelAttribute("email") String email) throws IOException {
+	public String ChangeProfile(@ModelAttribute("avatar") MultipartFile avatar,
+								@ModelAttribute("fullname") String fullname, @ModelAttribute("phone") String phone,
+								@ModelAttribute("email") String email) {
 		User user = (User) session.getAttribute("acc");
 		if (user != null) {
 			if (!avatar.isEmpty()) {
@@ -237,7 +222,7 @@ public class UserController {
 	}
 
 	@GetMapping("/code")
-	public String codeView(Model model) throws Exception {
+	public String codeView(Model model) {
 		User userForgot = (User) session.getAttribute("userForgot");
 		String noSendEmail = (String) session.getAttribute("noSendEmail");
 		if (noSendEmail == null) {
@@ -261,7 +246,7 @@ public class UserController {
 	}
 
 	@PostMapping("/code")
-	public String codeHandel(@ModelAttribute("code_input") int code_input, Model model) throws Exception {
+	public String codeHandel(@ModelAttribute("code_input") int code_input) {
 		int code = (int) session.getAttribute("code");
 		if (code == code_input) {
 			session.setAttribute("code", null);
@@ -287,7 +272,7 @@ public class UserController {
 
 	@PostMapping("newpass")
 	public String newPassHandel(@ModelAttribute("new_pass") String new_pass,
-			@ModelAttribute("confirm_new_pass") String confirm_new_pass, Model model) throws Exception {
+			@ModelAttribute("confirm_new_pass") String confirm_new_pass) {
 		if (new_pass.equals(confirm_new_pass)) {
 			String encodedValue = Base64.getEncoder().encodeToString(new_pass.getBytes());
 			User userForgot = (User) session.getAttribute("userForgot");
@@ -301,13 +286,4 @@ public class UserController {
 
 	}
 
-//	@GetMapping("/signin-google")
-//	public String SignInGoogle(@ModelAttribute("code") String code, Model model) throws Exception {
-//		System.out.println("=========" + code);
-//		String accessToken = getToken(code);
-//		System.out.println(accessToken);
-//		AccountGoogle accountGoogle = getUserInfo(accessToken);
-//		System.out.println(accountGoogle);
-//		return "redirect:/home";
-//	}
 }

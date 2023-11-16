@@ -1,16 +1,14 @@
 package WebProject.WebProject.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-
+import WebProject.WebProject.entity.Product;
+import WebProject.WebProject.repository.ProductRepository;
+import WebProject.WebProject.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import WebProject.WebProject.entity.Product;
-import WebProject.WebProject.repository.ProductRepository;
-import WebProject.WebProject.service.ProductService;
+import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -49,12 +47,6 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> findByProduct_NameContaining(String name) {
-		// TODO Auto-generated method stub
-		return productRepository.findByProduct_NameContaining(name);
-	}
-
-	@Override
 	public List<Product> findTop12ProductBestSellers() {
 		// TODO Auto-generated method stub
 		return productRepository.findTop12ProductBestSellers();
@@ -81,9 +73,5 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findByProduct_NameContaining(name, pageable);
 	}
 
-	@Override
-	public List<Product> findTop4ProductByCategory_id(int id) {
-		return productRepository.findTop4ProductByCategory_id(id);
-	}
 	
 }

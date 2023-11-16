@@ -8,13 +8,12 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data // lombok giúp generate các hàm constructor, get, set v.v.
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "user")
 public class User {
 	@Id()
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	
 	@Column(name = "login_Type", columnDefinition = "nvarchar(1111)")

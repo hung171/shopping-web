@@ -214,3 +214,76 @@
     });
 
 })(jQuery);
+
+
+
+//dragandrop
+const destinationBoxes = document.querySelectorAll(".destination-box");
+const productItems = document.querySelectorAll(".product__item__pic");
+
+let draggedElement = null;
+
+productItems.forEach((productItem) => {
+    productItem.addEventListener("dragstart", (e) => {
+        draggedElement = e.target;
+    });
+});
+
+destinationBoxes.forEach((destinationBox) => {
+    destinationBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        destinationBox.classList.add("hovered");
+    });
+
+    destinationBox.addEventListener("dragleave", () => {
+        destinationBox.classList.remove("hovered");
+    });
+
+    destinationBox.addEventListener("drop", (e) => {
+        e.preventDefault();
+        destinationBox.classList.remove("hovered");
+
+        // Kiểm tra xem ô đích đã có ảnh chưa và có phải là ảnh được kéo
+        if (destinationBox.childElementCount === 0 && draggedElement) {
+            const clonedImage = draggedElement.cloneNode(true);
+
+            // Gán sự kiện dragstart cho bản sao để cho phép kéo tiếp tục
+            clonedImage.addEventListener("dragstart", (e) => {
+                draggedElement = e.target;
+            });
+
+            // Gán sự kiện dragend để xử lý sau khi kéo
+            clonedImage.addEventListener("dragend", () => {
+                draggedElement = null;
+            });
+
+            // Thêm bản sao vào ô đích
+            destinationBox.appendChild(clonedImage);
+
+            // Gán sự kiện contextmenu để ẩn ảnh khi click chuột phải
+            clonedImage.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
+                destinationBox.removeChild(clonedImage);
+                // Khôi phục border khi xoá ảnh
+                destinationBox.style.border = "2px solid #333";
+            });
+
+            // Ẩn border khi ảnh được kéo vào ô đích
+            destinationBox.style.border = "none";
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+

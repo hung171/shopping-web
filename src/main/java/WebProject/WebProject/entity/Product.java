@@ -59,7 +59,4 @@ public class Product {
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
 	private List<Cart> cart;
 
-	@ManyToMany(mappedBy = "products")
-	private List<Outfit> outfits;
-
 }

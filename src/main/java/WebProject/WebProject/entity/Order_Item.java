@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Data // lombok giúp generate các hàm constructor, get, set v.v.
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "order_item")

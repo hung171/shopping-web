@@ -18,8 +18,6 @@ public interface ProductService {
 
 	void deleteProductById(int id);
 	
-	List<Product> findByProduct_NameContaining(String name);
-	
 	List<Product> findTop12ProductBestSellers();
 	
 	List<Product> findTop12ProductNewArrivals();
@@ -30,5 +28,4 @@ public interface ProductService {
 
 	Page<Product> findByProduct_NameAndCategory_idContaining(String name, int category_id, Pageable pageable);
 
-	List<Product> findTop4ProductByCategory_id(int name);
 }

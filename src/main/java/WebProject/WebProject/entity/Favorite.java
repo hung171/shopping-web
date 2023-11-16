@@ -8,22 +8,22 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "outfit_product")
-public class Outfit_Product {
+@Table(name = "favoriteList")
+public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-
-    private int quantity;
-
     @ManyToOne
-    @JoinColumn(name = "outfit_id")
-    private Outfit outfit;
+    @JoinColumn(name = "user_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Product product;
-
 
 }

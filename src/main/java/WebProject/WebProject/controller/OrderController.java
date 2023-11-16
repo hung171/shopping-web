@@ -79,9 +79,6 @@ public class OrderController {
         if (payOndelivery == true) {
             payment_method = "Payment on delivery";
         }
-		/*else {
-			payment_method = "Payment with momo";
-		}*/
         Order newOrder = new Order();
         newOrder.setTotal(Total);
         newOrder.setAddress(address);

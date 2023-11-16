@@ -50,9 +50,9 @@ public class CategoryController {
 	}
 	
 	@GetMapping("/category/{id}/{p}")
-	public String categoryPage(@PathVariable int id,@PathVariable int p, Model model, HttpServletRequest request) throws Exception {
+	public String categoryPage(@PathVariable int id,@PathVariable int p, Model model, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
-		Pageable pageable = PageRequest.of(p, 12);
+		Pageable pageable = PageRequest.of(p, 9);
 		Page<Product> page = productRepository.findAllByCategory_id(id, pageable);
 		Category category = categoryService.getCategoryById(id);
 		List<Category> listCategory = categoryService.findAll();
@@ -67,7 +67,6 @@ public class CategoryController {
 		model.addAttribute("listProduct", page);
 		model.addAttribute("referer", referer);
 		model.addAttribute("idCate", id);
-//		model.addAttribute("noPageable", "noPageable");
 		model.addAttribute("noPageable", "category");
 		return "shop";
 	}
