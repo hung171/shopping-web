@@ -166,13 +166,6 @@
                                     style="margin-left: 20px; color: rgb(207, 32, 97)"
                                     th:text="' and ' + ${#lists.size(y.order_Item)} + ' more ...'"></span>
                                 <ul>
-                                    <li class="unpaid" style="color: #5392fa;"
-                                        th:if="${y.payment_Method=='Payment on delivery'}"
-                                        th:text="${y.payment_Method}"></li>
-                                    <li class="paid"
-                                        th:if="${y.payment_Method=='Payment with momo'}"
-                                        th:text="${y.payment_Method}">Paid
-                                    </li>
                                     <li th:text="'Order: #' + ${y.id}"></li>
                                     <li
                                             th:text="'Date: ' + ${#dates.format(y.booking_Date, 'dd-MM-yyyy')}"></li>

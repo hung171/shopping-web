@@ -68,7 +68,7 @@ public class OutfitController {
     }
 
     @GetMapping("/addToFavorite/{id}")
-    public String AddToFavorite(@PathVariable int id, Model model, HttpServletRequest request) throws Exception {
+    public String AddToFavorite(@PathVariable int id, HttpServletRequest request) {
         String referer = request.getHeader("Referer");
         User user = (User) session.getAttribute("acc");
         if (user == null) {

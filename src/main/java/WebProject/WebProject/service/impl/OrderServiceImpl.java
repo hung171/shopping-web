@@ -49,14 +49,5 @@ public class OrderServiceImpl implements OrderService{
 	public void deleteById(int id) {
 		orderRepository.deleteById(id);
 	}
-	@Override
-	public List<Order> findAllByPayment_Method(String payment_Method) {
-		return orderRepository.findAllByPayment_Method(payment_Method);
-	}
-	@Override
-	public List<Order> findTop5OrderByPaymentMethod(String payment_method) {
-		return orderRepository.findTop5OrderByPaymentMethod(payment_method);
-	}
-	
-	
+
 }

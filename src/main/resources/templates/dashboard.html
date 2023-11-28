@@ -119,6 +119,8 @@
 								class="sl sl-icon-layers"></i> My products</a></li>
 						<li><a th:href="@{/dashboard-addproduct}"><i
 								class="sl sl-icon-plus"></i> Add Product</a></li>
+						<li><a th:href="@{/dashboard-code}"><i
+								class="sl sl-icon-star"></i> Voucher code</a></li>
 					</ul>
 
 					<ul data-submenu-title="Account">
@@ -218,42 +220,79 @@
 				<div class="row" style="margin-bottom: 70px;">
 
 					<!-- Recent Activity -->
-					<div class="col-lg-6 col-md-12">
+					<div class="col-lg-12 col-md-12">
 						<div class="dashboard-list-box with-icons margin-top-20">
-							<h4>Recent Customers</h4>
-							<ul>
-								<th:block th:each="y : ${recentCustomer}">
-									<li style="padding-left: 30px;"><img
-										style="width: 45px; border-radius: 50%"
-										th:src="${y.avatar}"
-										alt=""><strong th:text="${y.user_Name}"></strong> <a th:text="'Email: ' + ${y.email}"></a></li>
-								</th:block>
-							</ul>
-						</div>
-					</div>
+							<h4>Customers</h4>
+							<table class="table" style="background-color: #FFFFFF">
+								<thead>
+								<tr>
+									<th scope="col">Avatar</th>
+									<th scope="col">Họ Tên</th>
+									<th scope="col">Email</th>
+									<th scope="col"></th>
+								</tr>
+								</thead>
+								<tbody>
+								<th:block th:each="y : ${ListCustomer}">
+									<tr>
+										<td>
+											<img style="width: 45px; border-radius: 50%" th:src="${y.avatar}" alt="">
+										</td>
+										<td>
+											<strong th:text="${y.user_Name}"></strong>
+										</td>
+										<td>
+											<a th:text="${y.email}"></a>
+										</td>
+										<td>
+											<!-- Reply to review popup -->
+											<div th:id="'small-dialog-' + ${y.id}" class="zoom-anim-dialog mfp-hide popup-container">
+												<div class="small-dialog-header">
+													<h3>Send Message</h3>
+												</div>
+												<div class="message-reply margin-top-0">
+													<form action="/send-message" method="post">
+														<textarea name="message" cols="40" rows="3" th:placeholder="'Your Message to ' + ${y.user_Name}"></textarea>
+														<input name="email" th:value="${y.email}">
+														<button type="submit" class="button">Send</button>
+													</form>
+												</div>
+											</div>
 
-					<!-- Invoices -->
-					<div class="col-lg-6 col-md-12">
-						<div class="dashboard-list-box invoices with-icons margin-top-20">
-							<h4>Recent Orders</h4>
-							<ul>
-								<th:block th:each="y : ${recentOrders}">
-									<li><i class="list-box-icon sl sl-icon-doc"></i> <strong th:text="${y.user.user_Name}"></strong>
-										<ul>
-											<li th:if="${y.payment_Method == 'Payment on delivery'}" class="unpaid">Payment on delivery</li>
-											<li th:if="${y.payment_Method == 'Payment with momo'}" class="paid">Payment with momo</li>
-											<li th:text="'Order: #' + ${y.id}">Order: </li>
-											<li th:text="'Date: ' + ${#dates.format(y.booking_Date, 'dd/MM/yyyy')}"></li>
-											<li th:text="'Price: ' + ${#numbers.formatDecimal(y.total, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></li>
-										</ul>
-										<div class="buttons-to-right">
-											<a th:href="@{/dashboard-invoice/{id}(id=${y.id})}" class="button gray">View
-												Invoice</a>
+											<a th:href="'#small-dialog-' + ${y.id}" class="rate-review popup-with-zoom-anim" th:data-user-id="${y.id}">
+												<i class="sl sl-icon-envelope-open"></i> Send Message
+											</a>
+
+										</td>
+									</tr>
+								</th:block>
+								<tr>
+									<td></td>
+									<td></td>
+									<td></td>
+									<td>
+										<!-- Send for all popup -->
+										<div id="small-dialog-all" class="zoom-anim-dialog mfp-hide popup-container">
+											<div class="small-dialog-header">
+												<h3>Send Message For All Users</h3>
+											</div>
+											<div class="message-reply margin-top-0">
+												<form action="/send-message-for-all" method="post">
+													<textarea name="message" cols="40" rows="3" th:placeholder="'Your Message to All Users'"></textarea>
+													<input type="checkbox" name="sendToAll" value="true"> Send to All Users
+													<button type="submit" class="button">Send</button>
+												</form>
+											</div>
 										</div>
-									</li>
-								</th:block>
 
-							</ul>
+										<a th:href="'#small-dialog-all'" class="rate-review popup-with-zoom-anim">
+											<i class="sl sl-icon-envelope-open"></i> Send Message For All Users
+										</a>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+
 						</div>
 					</div>
 				</div>
@@ -272,19 +311,35 @@
 
 	<!-- Scripts
 ================================================== -->
-	<script type="text/javascript" src="scripts/jquery-3.6.0.min.js"></script>
+	<script type="text/javascript" src="/scripts/jquery-3.6.0.min.js"></script>
 	<script type="text/javascript"
-		src="scripts/jquery-migrate-3.3.2.min.js"></script>
-	<script type="text/javascript" src="scripts/mmenu.min.js"></script>
-	<script type="text/javascript" src="scripts/chosen.min.js"></script>
-	<script type="text/javascript" src="scripts/slick.min.js"></script>
-	<script type="text/javascript" src="scripts/rangeslider.min.js"></script>
-	<script type="text/javascript" src="scripts/magnific-popup.min.js"></script>
-	<script type="text/javascript" src="scripts/waypoints.min.js"></script>
-	<script type="text/javascript" src="scripts/counterup.min.js"></script>
-	<script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="scripts/tooltips.min.js"></script>
-	<script type="text/javascript" src="scripts/custom.js"></script>
+		src="/scripts/jquery-migrate-3.3.2.min.js"></script>
+	<script type="text/javascript" src="/scripts/mmenu.min.js"></script>
+	<script type="text/javascript" src="/scripts/chosen.min.js"></script>
+	<script type="text/javascript" src="/scripts/slick.min.js"></script>
+	<script type="text/javascript" src="/scripts/rangeslider.min.js"></script>
+	<script type="text/javascript" src="/scripts/magnific-popup.min.js"></script>
+	<script type="text/javascript" src="/scripts/waypoints.min.js"></script>
+	<script type="text/javascript" src="/scripts/counterup.min.js"></script>
+	<script type="text/javascript" src="/scripts/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="/scripts/tooltips.min.js"></script>
+	<script type="text/javascript" src="/scripts/custom.js"></script>
+	<!--<script>
+		function showPopup(element) {
+			var userId = element.getAttribute('data-user-id');
+			console.log('User ID:', userId);
+
+			// Xử lý logic hiển thị popup tùy thuộc vào nhu cầu
+			var dialogId = '#small-dialog-' + userId;
+			var popup = $(dialogId);
+
+			if (popup.length > 0) {
+				popup.show();
+			}
+			// Thêm các đoạn mã xử lý khác nếu cần thiết
+		}
+	</script>-->
+
 
 
 </body>

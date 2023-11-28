@@ -25,7 +25,4 @@ public interface OrderService {
 
 	void deleteById(int id);
 
-	List<Order> findAllByPayment_Method(String payment_Method);
-
-	List<Order> findTop5OrderByPaymentMethod(String payment_method);
 }

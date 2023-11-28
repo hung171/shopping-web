@@ -2484,11 +2484,11 @@ ol {
 	background: #111111;
 	padding: 0 30px;
 	border: none;
-	position: absolute;
 	right: 0;
-	/* top: 0; */
-	bottom: 0;
-	height: 48%;
+	position: static;
+	bottom: auto;
+	width: auto;
+	min-height: 48px;
 }
 
 .cart__total {
@@ -3905,6 +3905,14 @@ ol {
 	background-repeat: no-repeat;
 	background-position: center;
 }
+
+.input-button-container {
+	display: flex;
+	align-items: center; /* Canh giữa các phần tử theo chiều dọc */
+	justify-content: space-between; /* Canh đều các phần tử theo chiều ngang */
+}
+
+
 
 
 

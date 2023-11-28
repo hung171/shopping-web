@@ -9,17 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -39,6 +35,9 @@ public class AdminController {
 
 	@Autowired
 	Order_ItemService order_ItemService;
+
+	@Autowired
+	DiscountCodeService discountCodeService;
 
 	@Autowired
 	CloudinaryService cloudinaryService;
@@ -96,18 +95,13 @@ public class AdminController {
 			List<Product> listProduct = productService.getAllProduct();
 			List<User> listUser = userService.findAll();
 			List<Category> listCategory = categoryService.findAll();
-			List<Order> recentOrders = orderService.findTop5RecentOrder();
-			List<String> recentUser = orderService.findTop5RecentCustomer();
-			List<User> recentCustomer = new ArrayList<>();
-			for (String y : recentUser) {
-				recentCustomer.add(userService.findByIdAndRole(y, "user"));
-			}
+			List<User> ListCustomer = userService.findByRole("user");
+
 			model.addAttribute("Total_Order", listOrder.size());
 			model.addAttribute("Total_Product", listProduct.size());
 			model.addAttribute("Total_User", listUser.size());
 			model.addAttribute("Total_Category", listCategory.size());
-			model.addAttribute("recentOrders", recentOrders);
-			model.addAttribute("recentCustomer", recentCustomer);
+			model.addAttribute("ListCustomer", ListCustomer);
 			return "dashboard";
 		}
 	}
@@ -147,6 +141,7 @@ public class AdminController {
 		}
 	}
 
+	//send mail
 	@PostMapping("/send-message")
 	public String SendMessage(@ModelAttribute("message") String message,
 							  @ModelAttribute("email") String email, HttpServletRequest request) {
@@ -159,6 +154,29 @@ public class AdminController {
 		mail.setMailSubject("This is message from Male fashion.");
 		mail.setMailContent(message);
 		mailService.sendEmail(mail);
+		return "redirect:" + referer;
+	}
+
+	@PostMapping("/send-message-for-all")
+	public String SendMessageForAll(@ModelAttribute("message") String message,
+							  @RequestParam(value = "sendToAll", required = false) boolean sendToAll,
+							  HttpServletRequest request) {
+		String referer = request.getHeader("Referer");
+		System.out.println(message);
+
+		if (sendToAll) {
+			List<User> allUsers = userService.findByRole("user");
+
+			// Gửi email cho mỗi người dùng
+			for (User user : allUsers) {
+				Mail mail = new Mail();
+				mail.setMailFrom("hungnguyen17011911@gmail.com");
+				mail.setMailTo(user.getEmail());
+				mail.setMailSubject("This is a message from Male fashion.");
+				mail.setMailContent(message);
+				mailService.sendEmail(mail);
+			}
+		}
 		return "redirect:" + referer;
 	}
 
@@ -188,16 +206,14 @@ public class AdminController {
 			return "redirect:/signin-admin";
 		} else {
 			List<Order> listOrder = orderService.findAll();
-			List<Order> listPaymentOnDelivery = orderService.findAllByPayment_Method("Payment on delivery");
 			int TotalDelivery = 0;
-			for (Order y : listPaymentOnDelivery) {
+			for (Order y : listOrder) {
 				TotalDelivery = TotalDelivery + y.getTotal();
 			}
-			List<Order> listRecentDelivery = orderService.findTop5OrderByPaymentMethod("Payment on delivery");
 
 			model.addAttribute("TotalDelivery", TotalDelivery);
 			model.addAttribute("TotalOrder", listOrder.size());
-			model.addAttribute("listRecentDelivery", listRecentDelivery);
+			model.addAttribute("listOrder", listOrder);
 			return "dashboard-wallet";
 		}
 	}
@@ -219,7 +235,7 @@ public class AdminController {
 			return "dashboard-myproducts";
 		}
 	}
-
+	// edit product
 	@GetMapping("/dashboard-myproducts/edit/{id}")
 	public String DashboardMyProductEditView(@PathVariable int id, Model model) {
 		User admin = (User) session.getAttribute("admin");
@@ -241,8 +257,7 @@ public class AdminController {
 	public String DashboardMyProductEditHandel(@ModelAttribute("product_id") int product_id,
 											   @ModelAttribute("product_name") String product_name, @ModelAttribute("price") String price,
 											   @ModelAttribute("availability") String availability, @ModelAttribute("category") int category,
-											   @ModelAttribute("description") String description, @ModelAttribute("listImage") MultipartFile[] listImage)
-			throws Exception {
+											   @ModelAttribute("description") String description, @ModelAttribute("listImage") MultipartFile[] listImage) {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
 			return "redirect:/signin-admin";
@@ -296,6 +311,7 @@ public class AdminController {
 		}
 	}
 
+	//search
 	@PostMapping("/dashboard-myproduct/search")
 	public String DashboardMyproductSearch(@ModelAttribute("search-input") String search_input,
 			@ModelAttribute("category-selected") int category_selected, Model model) {
@@ -361,6 +377,7 @@ public class AdminController {
 		}
 	}
 
+	//add product
 	@GetMapping("dashboard-addproduct")
 	public String DashboardAddProductView(Model model) {
 		User admin = (User) session.getAttribute("admin");
@@ -377,10 +394,10 @@ public class AdminController {
 	}
 
 	@PostMapping("dashboard-addproduct")
-	public String DashboardAddProductHandel(Model model, @ModelAttribute("product_name") String product_name,
-			@ModelAttribute("price") String price, @ModelAttribute("availability") String availability,
-			@ModelAttribute("category") int category, @ModelAttribute("description") String description,
-			@ModelAttribute("listImage") MultipartFile[] listImage) throws Exception {
+	public String DashboardAddProductHandel(@ModelAttribute("product_name") String product_name,
+											@ModelAttribute("price") String price, @ModelAttribute("availability") String availability,
+											@ModelAttribute("category") int category, @ModelAttribute("description") String description,
+											@ModelAttribute("listImage") MultipartFile[] listImage) {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
 			return "redirect:/signin-admin";
@@ -420,7 +437,7 @@ public class AdminController {
 	}
 
 	@GetMapping("dashboard-deleteproduct/{productId}")
-	public String deleteProduct(Model model, @PathVariable("productId") int productId) {
+	public String deleteProduct(@PathVariable("productId") int productId) {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
 			return "redirect:/signin-admin";
@@ -437,6 +454,7 @@ public class AdminController {
 		}
 	}
 
+	//Profile admin
 	@GetMapping("dashboard-myprofile")
 	public String DashboardMyProfile(Model model) {
 		User admin = (User) session.getAttribute("admin");
@@ -458,9 +476,9 @@ public class AdminController {
 	}
 
 	@PostMapping("/dashboard-myprofile/changepassword")
-	public String DashboardChangePassword(Model model, @ModelAttribute("current_password") String current_password,
-			@ModelAttribute("new_password") String new_password,
-			@ModelAttribute("confirm_password") String confirm_password, HttpServletRequest request) {
+	public String DashboardChangePassword(@ModelAttribute("current_password") String current_password,
+										  @ModelAttribute("new_password") String new_password,
+										  @ModelAttribute("confirm_password") String confirm_password, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
@@ -488,9 +506,9 @@ public class AdminController {
 	}
 
 	@PostMapping("/dashboard-myprofile/changeProfile")
-	public String ChangeProfile(Model model, @ModelAttribute("avatar") MultipartFile avatar,
-			@ModelAttribute("fullname") String fullname, @ModelAttribute("phone") String phone,
-			@ModelAttribute("email") String email) throws IOException {
+	public String ChangeProfile(@ModelAttribute("avatar") MultipartFile avatar,
+								@ModelAttribute("fullname") String fullname, @ModelAttribute("phone") String phone,
+								@ModelAttribute("email") String email) {
 		User admin = (User) session.getAttribute("admin");
 		if (admin == null) {
 			return "redirect:/signin-admin";
@@ -506,6 +524,62 @@ public class AdminController {
 			session.setAttribute("admin", admin);
 			session.setAttribute("messageChangeProfile", "Change Success.");
 			return "redirect:/dashboard-myprofile";
+		}
+	}
+
+	//voucher Code
+	@GetMapping("/dashboard-code")
+	public String ViewDiscountCode(Model model, RedirectAttributes redirectAttributes) {
+		User admin = (User) session.getAttribute("admin");
+		if (admin == null) {
+			return "redirect:/signin-admin";
+		} else {
+			List<DiscountCode> discountCodeList = discountCodeService.findAll();
+			model.addAttribute("discountCodeList", discountCodeList);
+			String errorMessage = (String) redirectAttributes.getFlashAttributes().get("errorMessage");
+			if (errorMessage != null) {
+				model.addAttribute("errorMessage", errorMessage);
+			}
+			return  "dashboard-code";
+		}
+	}
+
+	@PostMapping("dashboard-addcode")
+	public String AddDiscountCode(@ModelAttribute("code") String code,
+								  @ModelAttribute("discountAmount") String discountAmount,
+								  RedirectAttributes redirectAttributes) {
+		User admin = (User) session.getAttribute("admin");
+		if (admin == null) {
+			return "redirect:/signin-admin";
+		} else {
+			DiscountCode checkCode = discountCodeService.findByCode(code);
+			if(checkCode != null) {
+				redirectAttributes.addFlashAttribute("errorMessage", "Mã giảm giá đã tồn tại. Vui lòng chọn mã khác.");
+			} else {
+				DiscountCode newDiscoutCode = new DiscountCode();
+				newDiscoutCode.setCode(code);
+				newDiscoutCode.setDiscountAmount(Integer.parseInt(discountAmount));
+				newDiscoutCode.setActive(true);
+				discountCodeService.saveDiscountCode(newDiscoutCode);
+			}
+			return "redirect:/dashboard-code";
+		}
+	}
+
+	@GetMapping("dashboard-deletecode/{codeId}")
+	public String deleteCode(@PathVariable("codeId") int codeId) {
+		User admin = (User) session.getAttribute("admin");
+		if (admin == null) {
+			return "redirect:/signin-admin";
+		} else {
+			DiscountCode code = discountCodeService.findById(codeId);
+			if (code != null) {
+				discountCodeService.deleteCode(code.getId());
+				session.setAttribute("deleteCode", "deleteCodeSuccess");
+				return "redirect:/dashboard-code";
+			} else {
+				return "redirect:/dashboard-code";
+			}
 		}
 	}
 

@@ -23,9 +23,6 @@ public class Order {
 	@Column(name = "booking_Date")
 	private Date booking_Date;
 	
-	@Column(name = "payment_Method", columnDefinition = "nvarchar(1111)")
-	private String payment_Method;
-	
 	@Column(name = "status", columnDefinition = "nvarchar(1111)")
 	private String status;
 	
@@ -46,6 +43,9 @@ public class Order {
 	
 	@Column(name = "note", columnDefinition = "nvarchar(1111)")
 	private String note;
+
+	@Column(name = "discountAmount")
+	private int discountAmount;
 	
 	@OneToMany(mappedBy = "order")
 	private List<Order_Item> order_Item;

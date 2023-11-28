@@ -24,8 +24,8 @@
 		<!-- Header -->
 		<div class="row">
 			<div class="col-md-6">
-				<a th:href="@{home}" class="dashboard-logo"><img
-						src="/images/logo2.png" alt=""></a>
+				<a class="dashboard-logo"><img
+						src="/img/logo.png" alt=""></a>
 			</div>
 			<div class="col-md-6">
 
@@ -71,7 +71,7 @@
 						<tr>
 							<td th:text="${y.product.product_Name}"></td>
 							<td th:text="${y.count}"></td>
-							<td th:text="${y.product.price} * ${y.count} + ' VNĐ'"></td>
+							<td th:text="${#numbers.formatDecimal(y.product.price * y.count, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
 						</tr>
 					</th:block>
 
@@ -80,8 +80,8 @@
 				<p>
 					<strong class="margin-bottom-5">Address: </strong>
 					<i th:text="${order.address}"></i><br>
-					<strong class="margin-bottom-5">Payment method: </strong>
-					<i th:text="${order.payment_Method}"></i>
+					<strong class="margin-bottom-5">Discount: </strong>
+					<i th:text="${order.discountAmount} + '%'"></i>
 				</p>
 				
 				
@@ -91,8 +91,8 @@
 
 				<table id="totals">
 					<tr>
-						<th>Total Due</th>
-						<th><span th:text="${order.total} + ' VNĐ'"></span></th>
+						<th>Final Amount</th>
+						<th><span th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></th>
 
 					</tr>
 				</table>

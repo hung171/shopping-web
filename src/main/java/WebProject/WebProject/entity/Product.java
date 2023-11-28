@@ -1,6 +1,5 @@
 package WebProject.WebProject.entity;
 
-import WebProject.WebProject.enums.Size;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,9 +18,6 @@ public class Product {
 
 	@Column(name = "product_Name", columnDefinition = "nvarchar(1111)")
 	private String product_Name;
-
-	@Column(name = "size")
-	private Size size;
 
 	@Column(name = "description", columnDefinition = "nvarchar(11111)")
 	private String description;

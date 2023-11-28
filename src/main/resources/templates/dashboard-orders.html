@@ -117,6 +117,8 @@
 								class="sl sl-icon-layers"></i> My products</a></li>
 						<li><a th:href="@{/dashboard-addproduct}"><i
 								class="sl sl-icon-plus"></i> Add Product</a></li>
+						<li><a th:href="@{/dashboard-code}"><i
+								class="sl sl-icon-star"></i> Voucher code</a></li>
 					</ul>
 
 					<ul data-submenu-title="Account">
@@ -210,7 +212,7 @@
 													</div>
 
 													<!-- Reply to review popup -->
-													<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+													<div th:id="'small-dialog-' + ${y.user.id}" class="zoom-anim-dialog mfp-hide popup-container">
 														<div class="small-dialog-header">
 															<h3>Send Message</h3>
 														</div>
@@ -224,8 +226,8 @@
 														</div>
 													</div>
 
-													<a href="#small-dialog"
-														class="rate-review popup-with-zoom-anim"><i
+													<a th:href="'#small-dialog-' + ${y.user.id}"
+														class="rate-review popup-with-zoom-anim" th:data-user-id="${y.user.id}"><i
 														class="sl sl-icon-envelope-open"></i> Send Message</a>
 												</div>
 											</div>

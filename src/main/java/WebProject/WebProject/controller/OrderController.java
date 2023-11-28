@@ -7,11 +7,14 @@ import WebProject.WebProject.service.Order_ItemService;
 import WebProject.WebProject.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.sql.Date;
 import java.util.Collections;
@@ -46,9 +49,17 @@ public class OrderController {
             List<Cart> Cart = cartService.GetAllCartByUser_id(user.getId());
             if (!Cart.isEmpty()) {
                 String a = session.getAttribute("Total").toString();
+                Object discountObject = session.getAttribute("discount");
+                String b = (discountObject != null) ? discountObject.toString() : "0";
                 int Total = Integer.parseInt(a);
+                int Discount = Integer.parseInt(b);
                 System.out.println(Total);
+                System.out.println(Discount);
+                int FinalTotal = Total - (Total*Discount)/100;
                 model.addAttribute("Total", a);
+                model.addAttribute("Discount", b);
+                model.addAttribute("FinalTotal", FinalTotal);
+
                 @SuppressWarnings("unchecked")
                 List<Cart> listCart = (List<Cart>) session.getAttribute("listCart");
                 model.addAttribute("listCart", listCart);
@@ -61,11 +72,10 @@ public class OrderController {
     }
 
     @PostMapping("checkout")
+    @Transactional
     public String CheckOut(@ModelAttribute("fullname") String fullname, @ModelAttribute("country") String country,
                            @ModelAttribute("address") String address, @ModelAttribute("phone") String phone,
-                           @ModelAttribute("email") String email, @ModelAttribute("note") String note,
-                           @RequestParam(value = "payOndelivery", defaultValue = "false") boolean payOndelivery,
-                           HttpServletResponse resp) throws Exception {
+                           @ModelAttribute("email") String email, @ModelAttribute("note") String note) {
 
         long millis = System.currentTimeMillis();
         Date booking_date = new java.sql.Date(millis);
@@ -74,20 +84,20 @@ public class OrderController {
         User user = (User) session.getAttribute("acc");
         String a = session.getAttribute("Total").toString();
         int Total = Integer.parseInt(a);
+        Object discountObject = session.getAttribute("discount");
+        String b = (discountObject != null) ? discountObject.toString() : "0";
+        int Discount = Integer.parseInt(b);
+        int FinalTotal = Total - (Total*Discount)/100;
         String status = "Pending";
-        String payment_method = null;
-        if (payOndelivery == true) {
-            payment_method = "Payment on delivery";
-        }
         Order newOrder = new Order();
-        newOrder.setTotal(Total);
+        newOrder.setTotal(FinalTotal);
+        newOrder.setDiscountAmount(Discount);
         newOrder.setAddress(address);
         newOrder.setBooking_Date(booking_date);
         newOrder.setCountry(country);
         newOrder.setEmail(email);
         newOrder.setFullname(fullname);
         newOrder.setNote(note);
-        newOrder.setPayment_Method(payment_method);
         newOrder.setPhone(phone);
         newOrder.setStatus(status);
         newOrder.setUser(user);
@@ -104,11 +114,13 @@ public class OrderController {
             newOrder_Item.setOrder(newOrder);
             newOrder_Item.setProduct(y.getProduct());
             order_ItemService.saveOrder_Item(newOrder_Item);
-            cartService.deleteById(y.getId());
         }
         listOrder = orderService.getAllOrderByUser_Id(user.getId());
         newOrder = listOrder.get(listOrder.size() - 1);
+        cartService.deleteAllByUser_id(user.getId());
         session.setAttribute("order", newOrder);
+        session.removeAttribute("discount");
+        session.removeAttribute("discountValue");
         return "redirect:/invoice";
 
     }
@@ -136,8 +148,7 @@ public class OrderController {
     }
 
     @GetMapping("/myhistory")
-    public String Myhistory(Model model, HttpServletRequest request) {
-        String referer = request.getHeader("Referer");
+    public String Myhistory(Model model) {
         User user = (User) session.getAttribute("acc");
         if (user == null) {
             session.setAttribute("AddToCartErr", "Vui lòng đăng nhập trước khi thực hiện thao tác!");

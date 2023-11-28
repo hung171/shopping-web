@@ -1,9 +1,11 @@
 package WebProject.WebProject.controller;
 
 import WebProject.WebProject.entity.Cart;
+import WebProject.WebProject.entity.DiscountCode;
 import WebProject.WebProject.entity.Product;
 import WebProject.WebProject.entity.User;
 import WebProject.WebProject.service.CartService;
+import WebProject.WebProject.service.DiscountCodeService;
 import WebProject.WebProject.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -27,32 +30,40 @@ public class CartController {
 	ProductService productService;
 
 	@Autowired
+	DiscountCodeService discountCodeService;
+
+	@Autowired
 	HttpSession session;
 
 	@GetMapping("/cart")
-	public String CartView(Model model) throws Exception {
+	public String CartView(Model model, HttpSession session) {
 		User user = (User) session.getAttribute("acc");
 		if (user == null) {
 			session.setAttribute("AddToCartErr", "Vui lòng đăng nhập trước khi thực hiện thao tác!");
 			return "redirect:/home";
 		} else {
 			List<Cart> listCart = cartService.GetAllCartByUser_id(user.getId());
-			int Total = 0;
-			for (Cart y : listCart) {
-				Total = Total + y.getCount() * y.getProduct().getPrice();
+			int total = 0;
+			for (Cart cartItem : listCart) {
+				total += cartItem.getCount() * cartItem.getProduct().getPrice();
 			}
-			if (listCart != null) {
-				model.addAttribute("Total", Total);
-				model.addAttribute("listCart", listCart);
-				session.setAttribute("listCart", listCart);
-				session.setAttribute("Total", Total);
-			}
+
+			Integer discount = (Integer) session.getAttribute("discountValue");
+			model.addAttribute("discount", discount);
+			session.setAttribute("discount", discount);
+
+			model.addAttribute("Total", total);
+			model.addAttribute("listCart", listCart);
+			session.setAttribute("listCart", listCart);
+			session.setAttribute("Total", total);
+
 			return "shopping-cart";
 		}
 	}
 
+
 	@GetMapping("/deleteCart/{id}")
-	public String GetDeleteCart(@PathVariable int id, Model model, HttpServletRequest request) throws Exception {
+	public String GetDeleteCart(@PathVariable int id, HttpServletRequest request) {
 		String referer = request.getHeader("Referer");
 		User user = (User) session.getAttribute("acc");
 		if (user == null) {
@@ -153,6 +164,24 @@ public class CartController {
 			return "redirect:" + referer;
 		}
 
+	}
+
+	@PostMapping("/check-code")
+	public String CheckVoucherCode(@ModelAttribute("code") String code, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		User user = (User) session.getAttribute("acc");
+		if (user == null) {
+			session.setAttribute("AddToCartErr", "Vui lòng đăng nhập trước khi thực hiện thao tác");
+		} else {
+			DiscountCode checkCode = discountCodeService.findByCode(code);
+			if (checkCode != null && checkCode.isActive()) {
+				int discountValue = checkCode.getDiscountAmount();
+				session.setAttribute("discountValue", discountValue);
+				redirectAttributes.addFlashAttribute("validCodeMessage", "Mã giảm giá hợp lệ.");
+			} else {
+				redirectAttributes.addFlashAttribute("invalidCodeMessage", "Mã giảm giá không hợp lệ.");
+			}
+		}
+		return "redirect:/cart";
 	}
 
 }

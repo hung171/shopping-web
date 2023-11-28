@@ -19539,4 +19539,47 @@ body .category-box-btn:hover {
 
 	#style-switcher { display: none; }
 
-	
+.popup-container {
+	background: #fff;
+	padding: 40px;
+	padding-top: 0;
+	text-align: left;
+	max-width: 610px;
+	margin: 40px auto;
+	position: relative;
+	box-sizing: border-box;
+	border-radius: 4px;
+}
+
+.popup-container.my-mfp-zoom-in .zoom-anim-dialog {
+	opacity: 0;
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+	-webkit-transform: scale(0.8);
+	-moz-transform: scale(0.8);
+	-ms-transform: scale(0.8);
+	-o-transform: scale(0.8);
+	transform: scale(0.8);
+}
+
+/* Thiết lập kiểu dáng cho thẻ a giống button xoá */
+a.delete-button {
+	display: inline-block;
+	padding: 8px 16px;
+	text-align: center;
+	text-decoration: none;
+	color: #fff;
+	background-color: #a69e9f;
+	border: 1px solid #a69e9f;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Thiết lập kiểu dáng khi di chuột qua thẻ a */
+a.delete-button:hover {
+	background-color: #c82333;
+	border-color: #bd2130;
+}

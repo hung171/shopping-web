@@ -172,9 +172,9 @@
 <!-- Shopping Cart Section Begin -->
 <section class="shopping-cart spad">
     <div class="container">
-        <form action="" method="POST" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-lg-8">
+        <div class="row">
+            <div class="col-lg-8">
+                <form action="/updateCart" method="POST" enctype="multipart/form-data" id="updateCartForm">
                     <div class="shopping__cart__table">
                         <table>
                             <thead>
@@ -189,11 +189,9 @@
                             <th:block th:each="y : ${listCart}">
                                 <tr>
                                     <td class="product__cart__item">
-                                        <div style="max-width: 90px; max-height: 90px;"
-                                             class="product__cart__item__pic">
+                                        <div style="max-width: 90px; max-height: 90px;" class="product__cart__item__pic">
                                             <img th:src="${y.product.productImage[0].url_Image}" alt="">
                                         </div>
-
                                         <div class="product__cart__item__text">
                                             <h6 th:text="${y.product.product_Name}"></h6>
                                             <h5 th:text="${#numbers.formatDecimal(y.product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></h5>
@@ -202,16 +200,12 @@
                                     <td class="quantity__item">
                                         <div class="quantity">
                                             <div class="pro-qty-2">
-                                                <input th:name="'count'+${yStat.index}" type="number"
-                                                       th:value="${y.count}">
+                                                <input th:name="'count'+${yStat.index}" type="number" th:value="${y.count}">
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="cart__price"
-                                        th:text="${#numbers.formatDecimal(y.product.price * y.count, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
-                                    <td class="cart__close"><a
-                                            th:href="@{/deleteCart/{id}(id=${y.id})}"><i
-                                            class="fa fa-close"></i></a></td>
+                                    <td class="cart__price" th:text="${#numbers.formatDecimal(y.product.price * y.count, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></td>
+                                    <td class="cart__close"><a th:href="@{/deleteCart/{id}(id=${y.id})}"><i class="fa fa-close"></i></a></td>
                                 </tr>
                             </th:block>
                             </tbody>
@@ -225,37 +219,47 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="continue__btn update__btn">
-                                <button formaction="/updateCart">
+                                <button type="submit" form="updateCartForm">
                                     <i class="fa fa-spinner"></i> Update cart
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg-4">
+                </form>
+            </div>
+            <div class="col-lg-4">
+                <form action="/check-code" method="POST">
                     <div class="cart__discount">
                         <h6>Discount codes</h6>
-                        <!-- <form action="#"> -->
-                        <input type="text" placeholder="Coupon code">
-                        <button type="submit">Apply</button>
-                        <!-- </form> -->
+                        <div class="input-button-container">
+                            <input type="text" placeholder="Coupon code" name="code" th:value="${code}" />
+                            <button type="submit">Apply</button>
+                        </div>
+                        <!-- Thông điệp cho mã giảm giá hợp lệ -->
+                        <div th:if="${validCodeMessage}" class="message success-message">
+                            <p th:text="${validCodeMessage}"></p>
+                        </div>
+                        <!-- Thông điệp cho mã giảm giá không hợp lệ -->
+                        <div th:if="${invalidCodeMessage}" class="message error-message">
+                            <p th:text="${invalidCodeMessage}"></p>
+                        </div>
                     </div>
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
                             <li>Customer <span th:text="${session.acc.user_Name}"></span></li>
-                            <li>Total <span
-                                    th:text="${#numbers.formatDecimal(Total, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
-                            </li>
+                            <li>Total <span th:text="${#numbers.formatDecimal(Total, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span></li>
+                            <li th:if="${discount != null}">Discount <span th:text="${discount} + '%'"></span></li>
                         </ul>
-                        <a th:href="@{/checkout}" class="primary-btn">Proceed to
-                            checkout</a>
+                        <a th:href="@{/checkout}" class="primary-btn">Proceed to checkout</a>
                     </div>
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </section>
+
+
 <!-- Shopping Cart Section End -->
 
 <!-- Footer Section Begin -->

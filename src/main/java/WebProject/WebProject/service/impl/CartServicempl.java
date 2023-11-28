@@ -2,6 +2,7 @@ package WebProject.WebProject.service.impl;
 
 import java.util.List;
 
+import WebProject.WebProject.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,10 @@ public class CartServicempl implements CartService{
 	public void saveCart(Cart cart) {
 		// TODO Auto-generated method stub
 		cartRepository.save(cart);
+	}
+
+	@Override
+	public void deleteAllByUser_id(String user_id) {
+		cartRepository.deleteAllByUser_id(user_id);
 	}
 }

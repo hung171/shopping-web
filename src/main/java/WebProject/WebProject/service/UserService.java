@@ -10,5 +10,7 @@ public interface UserService {
 
 	User findByIdAndRole(String id, String role);
 
-	List<User> findAll();    
+	List<User> findAll();
+
+	List<User> findByRole(String role);
 }
